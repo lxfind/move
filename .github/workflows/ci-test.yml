@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  max_threads: 16
 
 jobs:
   prepare:
@@ -48,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: prepare
-    if: ${{ needs.prepare.outputs.any-changes-founds == 'true' }}
+    # if: ${{ needs.prepare.outputs.any-changes-founds == 'true' }}
     steps:
       - uses: actions/checkout@v2.4.0
         with:
@@ -67,7 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     needs: prepare
-    if: ${{ needs.prepare.outputs.test-rust == 'true' }}
+    # if: ${{ needs.prepare.outputs.test-rust == 'true' }}
     steps:
       - uses: actions/checkout@v2.4.0
         with:
@@ -77,12 +79,12 @@ jobs:
       - uses: Swatinem/rust-cache@c5ed9ba6b7e1bb8aff90d43acd2f0af4990fa57c
       - name: run unit tests
         run: |
-          cargo nextest --nextest-profile ci --jobs ${max_threads} --test-threads ${max_threads} --changed-since "origin/$TARGET_BRANCH"
+          cargo nextest --nextest-profile ci --jobs ${max_threads} --test-threads ${max_threads} #--changed-since "origin/$TARGET_BRANCH"
         env:
           TARGET_BRANCH: ${{ needs.prepare.outputs.changes-target-branch }}
       - name: run doctests
         run: |
-          cargo xtest --doc --jobs ${max_threads} --changed-since "origin/$TARGET_BRANCH"
+          cargo xtest --doc --jobs ${max_threads} #--changed-since "origin/$TARGET_BRANCH"
         env:
           TARGET_BRANCH: ${{ needs.prepare.outputs.changes-target-branch }}
       # Skip junit for now
@@ -102,7 +104,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: prepare
-    if: ${{ needs.prepare.outputs.test-rust == 'true' }}
+    # if: ${{ needs.prepare.outputs.test-rust == 'true' }}
     steps:
       - uses: actions/checkout@v2.4.0
         with:
